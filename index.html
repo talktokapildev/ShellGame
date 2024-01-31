@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .container {
+      position: relative;
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border: 1px solid black;
+      margin: 10px;
+      text-align: center;
+      line-height: 100px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 24px;
+      background-color: #fff;
+    }
+
+    .ball {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: red;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      opacity: 1;
+    }
+
+    @keyframes shuffle {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(30px);
+      }
+      50% {
+        transform: translateX(0);
+      }
+      75% {
+        transform: translateX(-30px);
+      }
+    }
+  </style>
+  <title>Shell Game</title>
+</head>
+<body>
+  <div id="game-container"></div>
+  <script>
+    const gameContainer = document.getElementById('game-container');
+    const shells = ['A', 'B', 'C', 'D', 'E', 'F'];
+    let ballPosition;
+
+    function shuffle() {
+      for (let i = shells.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shells[i], shells[j]] = [shells[j], shells[i]];
+      }
+      ballPosition = Math.floor(Math.random() * 3);
+    }
+
+    function render() {
+      gameContainer.innerHTML = '';
+      shells.forEach((shell, index) => {
+        const container = document.createElement('div');
+        container.classList.add('container');
+        container.textContent = shell;
+        container.style.animation = 'shuffle 0.7s ease-in-out';
+        container.style.animationIterationCount = '1';
+
+        if (index === ballPosition) {
+          const ball = document.createElement('div');
+          ball.classList.add('ball');
+          ball.style.opacity = '0';
+          container.appendChild(ball);
+        }
+
+        container.addEventListener('click', () => handleGuess(index));
+        gameContainer.appendChild(container);
+      });
+    }
+
+    function animateShuffle() {
+      shuffle();
+      render();
+
+      setTimeout(() => {
+        gameContainer.style.pointerEvents = 'auto';
+      }, 500);
+    }
+
+    function handleGuess(selectedIndex) {
+      gameContainer.style.pointerEvents = 'none';
+      if (selectedIndex === ballPosition) {
+        alert('Congratulations! You found the ball.');
+      } else {
+        alert(`Sorry, you lost. Try again! The ball is under container ${shells[ballPosition]}`);
+      }
+      
+      const ball = document.querySelectorAll(".ball")[0];
+      ball.style.opacity = '1';
+
+      startGame();
+    }
+
+    function startGame() {
+      setTimeout(() => {
+        animateShuffle();
+      }, 2000); 
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
